@@ -4,10 +4,10 @@ This is [Chatter](http://www.salesforce.com/jp/chatter/overview/) adapter for hu
 
 ## Installation and Setup
 1. Add hubot-chatter to dependencies in your hubot's package.json.
-```json
+```
 "dependencies": {
-        "hubot-chatter": "1.0.0",
-        "hubot": "~2.8.2"
+    "hubot-chatter": "0.0.1",
+    "hubot": "~2.8.2"
 }
 ```
 
@@ -97,25 +97,25 @@ export HUBOT_SFDC_TOPIC=AllMessages
 
 #### Connect to Sandbox with setting to 5minutes for polling interval
 ```bash
-export HUBOT_SFDC_USERNAME='user@example.com.sandbox'
-export HUBOT_SFDC_PASSWORD='hogefuga'
-export HUBOT_SFDC_LOGINURL='https://test.salesforce.com'
+export HUBOT_SFDC_USERNAME=user@example.com.sandbox
+export HUBOT_SFDC_PASSWORD=hogefuga
+export HUBOT_SFDC_LOGINURL=https://test.salesforce.com
 export HUBOT_SFDC_POLLING_INTERVAL=300000
 ```
 
 #### Monitoring and Posting FeedComment Object
 ```bash
-export HUBOT_SFDC_USERNAME='user@example.com'
-export HUBOT_SFDC_PASSWORD='hogefuga'
-export HUBOT_SFDC_QUERY_OBJECT='FeedComment'
+export HUBOT_SFDC_USERNAME=user@example.com
+export HUBOT_SFDC_PASSWORD=hogefuga
+export HUBOT_SFDC_QUERY_OBJECT=FeedComment
 ```
 
 #### Monitoring and Posting The Record/Group Feed
 ```bash
-export HUBOT_SFDC_USERNAME='user@example.com'
-export HUBOT_SFDC_PASSWORD='hogefuga'
-export HUBOT_SFDC_PARENT_ID='001A0000019n4FhIAI' #Account Feed
- #export HUBOT_SFDC_PARENT_ID='0F9A0000000HZKUKA4' #Group Feed
+export HUBOT_SFDC_USERNAME=user@example.com
+export HUBOT_SFDC_PASSWORD=hogefuga
+export HUBOT_SFDC_PARENT_ID=001A0000019n4FhIAI #Account Feed
+#export HUBOT_SFDC_PARENT_ID=0F9A0000000HZKUKA4 #Group Feed
 ```
 
 ## Contribute
