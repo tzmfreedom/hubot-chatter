@@ -1,0 +1,25 @@
+{
+  "name": "hubot-chatter",
+  "version": "0.0.1",
+  "description": "This is adapter for hubot.",
+  "main": "./src/chatter.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chatter",
+    "hubot",
+    "salesforce"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tzmfreedom/hubot-chatter.git"
+  },
+  "author": "Makoto Tajitsu (http://freedom-man.com/blog)",
+  "license": "MIT",
+  "dependencies": {
+    "jsforce": "~1.3.1",
+    "dateformat": "~1.0.8",
+    "time": "~0.11.0"
+  }
+}
