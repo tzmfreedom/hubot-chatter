@@ -3,7 +3,9 @@
 This is [Chatter](http://www.salesforce.com/jp/chatter/overview/) adapter for hubot.
 
 ## Installation and Setup
-1. Add hubot-chatter to dependencies in your hubot's package.json.
+
+1.　Add hubot-chatter to dependencies in your hubot's package.json.  
+
 ```
 "dependencies": {
     "hubot-chatter": "0.0.1",
@@ -11,19 +13,19 @@ This is [Chatter](http://www.salesforce.com/jp/chatter/overview/) adapter for hu
 }
 ```
 
-2. Install hubot-chatter
-```bash
+2.　Install hubot-chatter  
+ ```bash
 npm install
 ```
 
-3. Set environment variables.
-``` bash
+3.　Set environment variables.  
+ ``` bash
 export HUBOT_SFDC_USERNAME="input hubot user's username"
 export HUBOT_SFDC_PASSWORD="input hubot user's password"
 ```
 
-4. Run hubot with chatter adapter.
-```bash
+4.　Run hubot with chatter adapter.  
+ ```bash
 bin/hubot -a chatter
 ```
 
@@ -78,6 +80,17 @@ If not specified, your hubot monitors and posts feeds to user account(refered by
 #### HUBOT_SFDC_POLLING_INTERVAL
 This is the number of milliseconds to wait between attempts when polling for results of the query result.  
 If not specified, this value defaults to 60,000(1min).
+
+
+## StreamingAPI
+If you want to use StreamingAPI for monitoring chatter feeds,
+Please implement 4 custom text fields for target Object.
+These fields mean following below.
+
+* User__c: Salesforce UserId.
+* ParentId__c: Related User/Group/Record ID.
+* Body__c: Message Body.
+* FeedItemId__c: Parent FeedItem ID.
 
 ## Sample
 
