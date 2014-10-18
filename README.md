@@ -1,4 +1,6 @@
 # Hubot Chatter Adapter
+[![Build Status](https://travis-ci.org/tzmfreedom/hubot-chatter.svg?branch=master)](https://travis-ci.org/tzmfreedom/hubot-chatter)
+
 ## Description
 This is [Chatter](http://www.salesforce.com/jp/chatter/overview/) adapter for hubot.
 
