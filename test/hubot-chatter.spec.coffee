@@ -47,7 +47,7 @@ describe "hubot-chatter", ->
     receive = sinon.spy(adapter, "receive")
     response = {
       records: [
-        { id : "AAAAA", Body: "hogehoge", ParentId: "BBBB", CreatedById: "CCCCC"}
+        { Id : "AAAAA", Body: "hogehoge", ParentId: "BBBB", CreatedById: "CCCCC"}
       ]
     }
     queryCallback(undefined, response)
@@ -55,10 +55,7 @@ describe "hubot-chatter", ->
     record = response.records[0];
     expect(receive.getCall(0).args[0].user).toBe(record.CreatedById)
     expect(receive.getCall(0).args[0].text).toBe(record.Body)
-    expect(receive.getCall(0).args[0].id).toBe("message-#{record.id}")
-    expect(receive.getCall(0).args[0].room).toBe(record.ParentId)
-    expect(receive.getCall(0).args[0].type).toBe(adapter.options.queryObject)
-    expect(receive.getCall(0).args[0].feedItemId).toBe(undefined)
+    expect(receive.getCall(0).args[0].id).toBe("message-#{record.Id}")
     adapter.receive.restore()
     done()
 
@@ -66,9 +63,9 @@ describe "hubot-chatter", ->
     receive = sinon.spy(adapter, "receive")
     response = {
       records: [
-        { id : "AAAAA1", Body: "hogehoge1", ParentId: "BBBB1", CreatedById: "CCCCC1"},
-        { id : "AAAAA2", Body: "hogehoge2", ParentId: "BBBB2", CreatedById: "CCCCC2"},
-        { id : "AAAAA3", Body: "hogehoge3", ParentId: "BBBB3", CreatedById: "CCCCC3"}
+        { Id : "AAAAA1", Body: "hogehoge1", ParentId: "BBBB1", CreatedById: "CCCCC1"},
+        { Id : "AAAAA2", Body: "hogehoge2", ParentId: "BBBB2", CreatedById: "CCCCC2"},
+        { Id : "AAAAA3", Body: "hogehoge3", ParentId: "BBBB3", CreatedById: "CCCCC3"}
       ]
     }
     queryCallback(undefined, response)
@@ -77,10 +74,7 @@ describe "hubot-chatter", ->
       record = response.records[i]
       expect(receive.getCall(i).args[0].user).toBe(record.CreatedById)
       expect(receive.getCall(i).args[0].text).toBe(record.Body)
-      expect(receive.getCall(i).args[0].id).toBe("message-#{record.id}")
-      expect(receive.getCall(i).args[0].room).toBe(record.ParentId)
-      expect(receive.getCall(i).args[0].type).toBe(adapter.options.queryObject)
-      expect(receive.getCall(i).args[0].feedItemId).toBe(undefined)
+      expect(receive.getCall(i).args[0].id).toBe("message-#{record.Id}")
     adapter.receive.restore()
     done()
 
@@ -113,7 +107,7 @@ describe "hubot-chatter", ->
     receive = sinon.spy(adapter, "receive")
     response = {
       sobject: {
-        id: "id"
+        Id: "id"
         User__c: "u"
         Body__c: "b"
         ParentId__c: "p"
@@ -125,16 +119,13 @@ describe "hubot-chatter", ->
     record = response.sobject
     expect(receive.getCall(0).args[0].user).toBe(record.User__c)
     expect(receive.getCall(0).args[0].text).toBe(record.Body__c)
-    expect(receive.getCall(0).args[0].id).toBe("message-#{record.id}")
-    expect(receive.getCall(0).args[0].room).toBe(record.ParentId__c)
-    expect(receive.getCall(0).args[0].type).toBe(adapter.options.queryObject)
-    expect(receive.getCall(0).args[0].feedItemId).toBe(record.FeedItemId__c)
+    expect(receive.getCall(0).args[0].id).toBe("message-#{record.Id}")
     adapter.receive.restore()
     done()
 
   it "should call create feeditem when send message", (done)->
     sinon.stub adapter.conn.chatter, "resource", (resource)->
-      expect(resource).toBe("/feeds/record/#{adapter.options.parentId}/feed-items")
+      expect(resource).toBe("/feeds/record/hogefuga/feed-items")
       return {
         create: (chatterBody, callback)->
           expect(chatterBody.body.messageSegments[0].type).toBe("Text")
@@ -143,11 +134,11 @@ describe "hubot-chatter", ->
           createCallback = callback
           done()
       }
-    adapter.send {message: {feedItem: ""}}, "hogemessage"
+    adapter.send {message: {feedItem: "", replyParentId: "hogefuga"}}, "hogemessage"
 
   it "should call create feedcomment when send message", (done)->
     sinon.stub adapter.conn.chatter, "resource", (resource)->
-      expect(resource).toBe("/feed-items/hogefeedcomment/comments")
+      expect(resource).toBe("/feed-items/0D5*******/comments")
       return {
         create: (chatterBody, callback)->
           message = envelope.message
@@ -157,12 +148,9 @@ describe "hubot-chatter", ->
           createCallback = callback
           done()
       }
-    envelope = {
-      message: {
-        feedItem: ""
-        replyParentId: "hogefeedcomment"
-      }
-    }
+    envelope =
+      message: 
+        replyParentId: "0D5*******"
     textmessage = "hogemessage"
     adapter.send envelope, textmessage
 
@@ -173,7 +161,7 @@ describe "hubot-chatter", ->
           message = envelope.message
           expect(chatterBody.body.messageSegments[0].type).toBe("Text")
           expect(chatterBody.body.messageSegments[0].text).toBe(textmessage)
-          expect(chatterBody.body.messageSegments[1].type).toBe("Mension")
+          expect(chatterBody.body.messageSegments[1].type).toBe("Mention")
           expect(chatterBody.body.messageSegments[1].id).toBe(message.replyMensionUserId)
           adapter.conn.chatter.resource.restore()
           createCallback = callback
@@ -181,8 +169,8 @@ describe "hubot-chatter", ->
       }
     envelope = {
       message: {
-        feedItem: ""
-        replyMensionUserId: "mension"
+        replyParentId: "0D5******"
+        replyMensionUserId: "mention"
       }
     }
     textmessage = "hogemessage"

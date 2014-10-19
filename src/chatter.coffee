@@ -42,6 +42,7 @@ class ChatterAdapter extends Adapter
     if @options.pollingType == 'streaming' && !@options.topic
       @robot.logger.error "set topic when you set 'streaming' to polling type."
       peocess.exit 1
+      return false
     return true
   run: ->
     if !@validate() then return
@@ -50,70 +51,70 @@ class ChatterAdapter extends Adapter
         @robot.logger.error "#{err}"
         process.exit 1
         return
+
+      @robot.logger.info "hubot login successful."
+
       if @options.parentId == ''
         @options.parentId = userinfo.id
 
       if @options.pollingType == 'streaming'
+        @robot.logger.info "start streaming..."
         @conn.streaming.topic(@options.topic).subscribe (res)=>
           record = res.sobject
-          message = new TextMessage record.User__c, record.Body__c, "message-#{record.id}"
-          message.room = record.ParentId__c
-          message.type = @options.queryObject
-          message.feedItemId = record.FeedItemId__c
+          message = new TextMessage record.User__c, record.Body__c, "message-#{record.Id}"
+          message.record = record
+          message.replyParentId = record.ParentId__c || record.Id
           @receive message
       else if @options.pollingType == 'query'
         parentIds = @options.parentId.split(',').join("','")
         @setNewThreshold()
         @queryInterval = setInterval =>
-          @robot.logger.info "polling query request..."
-          @conn.query "#{@options.querybase} WHERE ParentId IN ('#{@parentIds}') AND CreatedDate > #{@threashold} ORDER BY CreatedDate", (err, result)=>
+          @setNewThreshold()
+          @robot.logger.info "start query request...[#{@th_low}]-[#{@th_high}]"
+          @conn.query "#{@options.querybase} WHERE ParentId IN ('#{parentIds}') AND CreatedDate > #{@th_low} AND CreatedDate <= #{@th_high} ORDER BY CreatedDate", (err, result)=>
             if err
               @robot.logger.error "#{err}"
               process.exit 1
               return
             for record in result.records
-              message = new TextMessage record.CreatedById, record.Body || record.CommentBody, "message-#{record.id}"
-              message.room = record.ParentId
-              message.type = @options.queryObject
+              message = new TextMessage record.CreatedById, record.Body || record.CommentBody, "message-#{record.Id}"
               message.record = record
-              message.replyParentId = record.FeedItemId
+              message.replyParentId = record.FeedItemId || record.Id
               @receive message
-          @setNewThreshold()
         , @options.pollingInterval
 
     @emit 'connected'
 
   send: (envelope, strings...) =>
     for str in strings
-      if envelope.message.replyParentId
+      # if replyParent is FeedItem, send method create a FeedComment.
+      if envelope.message.replyParentId.substring(0, 3) == '0D5'
         resource_path = "/feed-items/#{envelope.message.replyParentId}/comments"
       else
-        resource_path = "/feeds/record/#{@options.parentId}/feed-items"
+        resource_path = "/feeds/record/#{envelope.message.replyParentId}/feed-items"
 
-      chatterBody = {
-        body: {
+      chatterBody = 
+        body:
           messageSegments: [{
             type: 'Text'
             text: str
           }]
-        }
-      }
       if envelope.message.replyMensionUserId
         chatterBody.body.messageSegments.push {
-          type: 'Mension'
+          type: 'Mention'
           id: envelope.message.replyMensionUserId
         }
       @conn.chatter.resource(resource_path).create chatterBody, (err, result) =>
         if err
           @robot.logger.error "#{err}"
-          process.exit 1
 
   reply: (envelope, strings...) ->
     for str in strings
       @send envelope, str
 
   setNewThreshold: ->
-    @threashold = new Date().toUTCFormat("YYYY-MM-DDTHH24:MI:SS.000Z")
+    @th_low = @th_high
+    @th_high = new Date().toUTCFormat("YYYY-MM-DDTHH24:MI:SS.000Z")
 
 exports.use = (robot) ->
   new ChatterAdapter robot
