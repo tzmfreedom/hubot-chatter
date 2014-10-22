@@ -10,7 +10,7 @@ This is [Chatter](http://www.salesforce.com/jp/chatter/overview/) adapter for hu
 
 ```
 "dependencies": {
-    "hubot-chatter": "0.0.1",
+    "hubot-chatter": "0.0.2",
     "hubot": "~2.8.2"
 }
 ```
