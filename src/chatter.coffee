@@ -41,7 +41,7 @@ class ChatterAdapter extends Adapter
       return false
     if @options.pollingType == 'streaming' && !@options.topic
       @robot.logger.error "set topic when you set 'streaming' to polling type."
-      peocess.exit 1
+      process.exit 1
       return false
     return true
   run: ->
